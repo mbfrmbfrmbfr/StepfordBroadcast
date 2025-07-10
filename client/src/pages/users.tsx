@@ -23,7 +23,7 @@ function UserForm({ user, onClose }: UserFormProps) {
     email: user?.email || "",
     password: "",
     role: user?.role || "editor",
-    departmentId: user?.departmentId?.toString() || "",
+    departmentId: user?.departmentId?.toString() || "none",
   });
   
   const { toast } = useToast();
@@ -74,7 +74,7 @@ function UserForm({ user, onClose }: UserFormProps) {
       name: formData.name,
       email: formData.email,
       role: formData.role,
-      departmentId: formData.departmentId ? parseInt(formData.departmentId) : null,
+      departmentId: formData.departmentId && formData.departmentId !== "none" ? parseInt(formData.departmentId) : null,
     };
 
     if (user) {
@@ -139,12 +139,12 @@ function UserForm({ user, onClose }: UserFormProps) {
       
       <div>
         <Label htmlFor="department">Department (Optional)</Label>
-        <Select value={formData.departmentId} onValueChange={(value) => setFormData({ ...formData, departmentId: value })}>
+        <Select value={formData.departmentId || "none"} onValueChange={(value) => setFormData({ ...formData, departmentId: value === "none" ? "" : value })}>
           <SelectTrigger>
             <SelectValue placeholder="Select department (optional)" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No Department</SelectItem>
+            <SelectItem value="none">No Department</SelectItem>
             {departments.map((dept) => (
               <SelectItem key={dept.id} value={dept.id.toString()}>
                 {dept.name}

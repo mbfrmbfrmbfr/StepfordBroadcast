@@ -69,7 +69,7 @@ export default function Profile() {
     const userData = {
       name: formData.name,
       email: formData.email,
-      departmentId: formData.departmentId ? parseInt(formData.departmentId) : null,
+      departmentId: formData.departmentId && formData.departmentId !== "none" ? parseInt(formData.departmentId) : null,
     };
 
     updateMutation.mutate(userData);
@@ -119,12 +119,12 @@ export default function Profile() {
             
             <div>
               <Label htmlFor="department">Department (Optional)</Label>
-              <Select value={formData.departmentId} onValueChange={(value) => setFormData({ ...formData, departmentId: value })}>
+              <Select value={formData.departmentId || "none"} onValueChange={(value) => setFormData({ ...formData, departmentId: value === "none" ? "" : value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select department (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Department</SelectItem>
+                  <SelectItem value="none">No Department</SelectItem>
                   {departments.map((dept) => (
                     <SelectItem key={dept.id} value={dept.id.toString()}>
                       {dept.name}
