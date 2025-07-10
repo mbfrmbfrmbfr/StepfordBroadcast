@@ -25,9 +25,6 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <span className="text-white text-2xl font-bold">SBC</span>
-              <span className="text-white text-sm ml-2 hidden sm:block">
-                Stepford Broadcasting Corporation
-              </span>
             </Link>
           </div>
           

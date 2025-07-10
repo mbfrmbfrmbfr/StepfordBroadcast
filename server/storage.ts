@@ -101,6 +101,7 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id: this.currentUserId++,
+      role: insertUser.role || "editor",
     };
     this.users.set(user.id, user);
     return user;
@@ -168,6 +169,11 @@ export class MemStorage implements IStorage {
     const article: Article = {
       ...insertArticle,
       id: this.currentArticleId++,
+      imageUrl: insertArticle.imageUrl || null,
+      departmentId: insertArticle.departmentId || null,
+      isBreaking: insertArticle.isBreaking || false,
+      breakingText: insertArticle.breakingText || null,
+      isPublished: insertArticle.isPublished || false,
       createdAt: now,
       updatedAt: now,
       publishedAt: insertArticle.isPublished ? now : null,
@@ -205,7 +211,7 @@ export class MemStorage implements IStorage {
 
   private enrichArticle(article: Article): ArticleWithDetails | undefined {
     const category = this.categories.get(article.categoryId);
-    const department = article.departmentId ? this.departments.get(article.departmentId) : null;
+    const department = article.departmentId ? this.departments.get(article.departmentId) || null : null;
     const author = this.users.get(article.authorId);
 
     if (!category || !author) return undefined;

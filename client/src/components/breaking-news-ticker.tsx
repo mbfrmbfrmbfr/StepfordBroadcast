@@ -7,24 +7,7 @@ export default function BreakingNewsTicker() {
   });
 
   if (isLoading || !breakingNews) {
-    return (
-      <div className="bg-[var(--sbc-red)] text-white py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center">
-            <span className="bg-white text-[var(--sbc-red)] px-3 py-1 rounded text-sm font-bold mr-4">
-              BREAKING
-            </span>
-            <div className="flex-1 overflow-hidden">
-              <div className="breaking-news-ticker">
-                <span className="inline-block whitespace-nowrap animate-marquee">
-                  No breaking news at this time
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
