@@ -36,6 +36,7 @@ DEFAULT_ADMIN_NAME=Site Administrator
 
 ## Build and Start
 
+### Option 1: Full Build (Recommended)
 1. Build the application:
    ```bash
    npm run build
@@ -44,6 +45,24 @@ DEFAULT_ADMIN_NAME=Site Administrator
 2. Start the application:
    ```bash
    npm start
+   ```
+
+### Option 2: Manual Build (If build fails)
+If the automated build fails with `import.meta.dirname` errors, use this manual approach:
+
+1. Build the client:
+   ```bash
+   npx vite build --outDir dist/public
+   ```
+
+2. Build the server:
+   ```bash
+   node build-server.js
+   ```
+
+3. Start the application:
+   ```bash
+   NODE_ENV=production node dist/index.js
    ```
 
 ## Process Management (Recommended)
@@ -172,11 +191,28 @@ If you want to use PostgreSQL instead of in-memory storage:
 
 ## Troubleshooting
 
-1. **Port conflicts**: Ensure no other service is using the configured port
+### Production Build Issues
+
+**Error**: `TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined`
+
+This error occurs when esbuild fails to handle `import.meta.dirname` correctly. Use the manual build approach:
+
+```bash
+# Stop any running development server first
+# Build client and server separately
+npx vite build --outDir dist/public
+node build-server.js
+NODE_ENV=production node dist/index.js
+```
+
+### Common Issues
+
+1. **Port conflicts**: Ensure no other service is using the configured port (stop dev server before starting production)
 2. **Permission issues**: Make sure the user has proper permissions to the project directory
 3. **Environment variables**: Verify all required environment variables are set correctly
 4. **Database connection**: If using PostgreSQL, ensure the database is running and accessible
 5. **Firewall blocking**: Check that the configured port is allowed through the firewall
+6. **Missing client build**: If you see "Could not find the build directory", make sure to build the client first
 
 ## Updates
 
