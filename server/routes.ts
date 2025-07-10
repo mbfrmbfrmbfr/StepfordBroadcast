@@ -57,16 +57,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/users/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      console.log("Updating user:", id, "with data:", req.body);
       const updateData = updateUserSchema.parse(req.body);
       const user = await storage.updateUser(id, updateData);
       // Remove password from response
       const { password, ...userResponse } = user;
       res.json(userResponse);
     } catch (error) {
+      console.error("Error updating user:", error);
       if (error instanceof Error && error.message.includes("not found")) {
         res.status(404).json({ message: "User not found" });
       } else {
-        res.status(400).json({ message: "Invalid user data" });
+        res.status(400).json({ message: "Invalid user data", error: error instanceof Error ? error.message : "Unknown error" });
       }
     }
   });
