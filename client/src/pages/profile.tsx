@@ -25,22 +25,16 @@ export default function Profile() {
     queryKey: ["/api/departments"],
   });
 
-  const { data: users = [] } = useQuery<User[]>({
-    queryKey: ["/api/users"],
-  });
-
-  // Find current user's full data
-  const userFullData = users.find(u => u.id === currentUser?.id);
-
+  // Initialize form with current user data
   useEffect(() => {
-    if (userFullData) {
+    if (currentUser) {
       setFormData({
-        name: userFullData.name,
-        email: userFullData.email,
-        departmentId: userFullData.departmentId?.toString() || "",
+        name: currentUser.name,
+        email: currentUser.email,
+        departmentId: "", // Will be loaded separately if needed
       });
     }
-  }, [userFullData]);
+  }, [currentUser]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateUser) => {
@@ -156,8 +150,7 @@ export default function Profile() {
         <CardContent>
           <div className="space-y-2 text-sm text-gray-600">
             <p><strong>Role:</strong> {currentUser.role}</p>
-            <p><strong>Account Created:</strong> {userFullData ? new Date(userFullData.createdAt).toLocaleDateString() : 'Loading...'}</p>
-            <p><strong>Last Updated:</strong> {userFullData ? new Date(userFullData.updatedAt).toLocaleDateString() : 'Loading...'}</p>
+            <p><strong>User ID:</strong> {currentUser.id}</p>
           </div>
         </CardContent>
       </Card>
