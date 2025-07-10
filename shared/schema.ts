@@ -7,7 +7,10 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
-  role: text("role").notNull().default("editor"),
+  role: text("role").notNull().default("editor"), // admin, editor
+  departmentId: integer("department_id").references(() => departments.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const categories = pgTable("categories", {
@@ -44,7 +47,14 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   name: true,
   role: true,
+  departmentId: true,
 });
+
+export const updateUserSchema = createInsertSchema(users).pick({
+  name: true,
+  email: true,
+  departmentId: true,
+}).partial();
 
 export const insertCategorySchema = createInsertSchema(categories).pick({
   name: true,
@@ -75,6 +85,7 @@ export const loginSchema = z.object({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Category = typeof categories.$inferSelect;

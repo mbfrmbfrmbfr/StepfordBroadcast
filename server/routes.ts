@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCategorySchema, insertDepartmentSchema, insertArticleSchema, loginSchema } from "@shared/schema";
+import { insertCategorySchema, insertDepartmentSchema, insertArticleSchema, insertUserSchema, updateUserSchema, loginSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -19,6 +19,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role } });
     } catch (error) {
       res.status(400).json({ message: "Invalid request data" });
+    }
+  });
+
+  // User management routes (admin only)
+  app.get("/api/users", async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      // Remove passwords from response
+      const sanitizedUsers = users.map(user => ({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        departmentId: user.departmentId,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }));
+      res.json(sanitizedUsers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.post("/api/users", async (req, res) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      const user = await storage.createUser(userData);
+      // Remove password from response
+      const { password, ...userResponse } = user;
+      res.status(201).json(userResponse);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid user data" });
+    }
+  });
+
+  app.put("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = updateUserSchema.parse(req.body);
+      const user = await storage.updateUser(id, updateData);
+      // Remove password from response
+      const { password, ...userResponse } = user;
+      res.json(userResponse);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("not found")) {
+        res.status(404).json({ message: "User not found" });
+      } else {
+        res.status(400).json({ message: "Invalid user data" });
+      }
+    }
+  });
+
+  app.delete("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteUser(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete user" });
     }
   });
 

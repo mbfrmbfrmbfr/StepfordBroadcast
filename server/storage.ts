@@ -4,7 +4,10 @@ export interface IStorage {
   // Users
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
+  deleteUser(id: number): Promise<void>;
   
   // Categories
   getCategories(): Promise<Category[]>;
@@ -42,13 +45,17 @@ export class MemStorage implements IStorage {
   }
 
   private seedData() {
-    // Create default user
+    // Create default admin user from environment variables
+    const now = new Date();
     const defaultUser: User = {
       id: this.currentUserId++,
-      email: "admin@sbc.com",
-      password: "password123", // In production, this should be hashed
-      name: "Admin User",
+      email: process.env.DEFAULT_ADMIN_EMAIL || "admin@sbc.com",
+      password: process.env.DEFAULT_ADMIN_PASSWORD || "admin123", // In production, this should be hashed
+      name: process.env.DEFAULT_ADMIN_NAME || "System Administrator",
       role: "admin",
+      departmentId: null,
+      createdAt: now,
+      updatedAt: now,
     };
     this.users.set(defaultUser.id, defaultUser);
 
@@ -97,14 +104,41 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values()).find(user => user.email === email);
   }
 
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
+    const now = new Date();
     const user: User = {
       ...insertUser,
       id: this.currentUserId++,
       role: insertUser.role || "editor",
+      departmentId: insertUser.departmentId || null,
+      createdAt: now,
+      updatedAt: now,
     };
     this.users.set(user.id, user);
     return user;
+  }
+
+  async updateUser(id: number, updateData: Partial<InsertUser>): Promise<User> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      throw new Error(`User with id ${id} not found`);
+    }
+
+    const updatedUser: User = {
+      ...existingUser,
+      ...updateData,
+      updatedAt: new Date(),
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    this.users.delete(id);
   }
 
   async getCategories(): Promise<Category[]> {

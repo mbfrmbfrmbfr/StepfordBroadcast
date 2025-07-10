@@ -63,6 +63,18 @@ export default function Navbar() {
                     Dashboard
                   </Button>
                 </Link>
+                {authService.getCurrentUser()?.role === "admin" && (
+                  <Link href="/users">
+                    <Button variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700">
+                      Users
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/profile">
+                  <Button variant="outline" className="bg-gray-600 text-white border-gray-600 hover:bg-gray-700 hover:border-gray-700">
+                    Profile
+                  </Button>
+                </Link>
                 <Button 
                   onClick={handleLogout}
                   variant="outline" 
